@@ -3,6 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-#replit.com
+# Replit.com config file
 .replit
 
