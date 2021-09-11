@@ -1,9 +1,9 @@
-from nn import *
+from nn import * 
 import random
 import math
 
 def main():
-    nn = Network((2,16,1))
+    nn = Network((2,256,16,1))
     
     training_data = [
     [[1,0],[1]],
@@ -22,5 +22,6 @@ def main():
         asdf = [x1,x2]
         outputs = nn.feedforward(asdf)
         print(outputs[-1])
+
 if __name__=='__main__':
-	main()
+    main()

@@ -31,8 +31,7 @@ class Network:
                 output = self.activation(output, self.activation_func)
             outputs.append(output)
             inputs = output
-        #print("\nOutputs in Hidden Layers:\n" + str(hidden_outputs[0]))
-        #print("\nOutput of Neural Network:\n" + str(outputs))
+        #print("\nOutputs of Neural Network:\n" + str(outputs))
         return outputs
         
     def calculate_errors(self, outputs, targets):
@@ -50,49 +49,46 @@ class Network:
        # for err in errors:
        #     print(err, "\n")
         
-        #errors.reverse() # Errors now going left->right (helps with train)
+        errors.reverse() # Errors now going left->right (helps with train)
         return errors
 
 
-    def train(self, inputs, targets):# I'm going to make this more scalable with loops and lists later (ignore spaghetti) 
+    def train(self, inputs, targets):
         outputs = self.feedforward(inputs)
         errors = self.calculate_errors(outputs, targets)
        
-        # Calulate Gradients
-
-
-
-
-        # Calculate Deltas from gradients
-
-
+        
+        # Calculate Gradients and Deltas from left->right through layers
+        gradients = []
+        deltas = []
+        for layer_index, (layer_output, layer_error) in enumerate(zip(outputs, errors)):
+            if layer_index == len(outputs):
+                layer_gradients = self.derivative(layer_output, "sigmoid")
+            else:
+                layer_gradients = self.derivative(layer_output, self.activation_func)
+            layer_gradients *= layer_error
+            layer_gradients *= self.learning_rate
+            gradients.append(layer_gradients)
+            
+            # Transpose input of layer, and mutiply by gradient to get deltas for weights  
+            if layer_index == 0:
+                inputs = np.array(inputs).reshape((self.layer_sizes[0],1))
+                layer_input_T = np.transpose(inputs)
+            else:
+                layer_input_T = np.transpose(outputs[layer_index-1])
+            
+            layer_deltas = np.matmul(layer_gradients, layer_input_T)
+            deltas.append(layer_deltas)
 
 
         # Update Weights by deltas
-
+        for d in range(len(deltas)):
+            self.weights[d] += deltas[d]
+            
         # Update Biases by gradients
-
-
-        gradients = self.derivative(outputs[-1], "sigmoid")
-        gradients *= errors[0]
-        gradients *= self.learning_rate
-
-        hidden_output_T = np.transpose(outputs[0])
-        weights_ho_deltas = np.matmul(gradients, hidden_output_T)
-        
-        self.weights[1] += weights_ho_deltas
-        self.biases[1] += gradients
-
-        hidden_gradients = self.derivative(outputs[0], self.activation_func)
-        hidden_gradients *= errors[1]
-        hidden_gradients *= self.learning_rate
-
-        inputs = np.array(inputs).reshape((self.layer_sizes[0],1))
-        inputs_T = np.transpose(inputs)
-        weights_ih_deltas = np.matmul(hidden_gradients, inputs_T)
-        
-        self.weights[0] += weights_ih_deltas
-        self.biases[0] += hidden_gradients
+        for g in range(len(gradients)):
+            self.biases[g] += gradients[g]
+    
 
     def activation(self, x, activation_func):
         if activation_func == "sigmoid":
