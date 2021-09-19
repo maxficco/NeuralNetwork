@@ -4,7 +4,7 @@ class Network:
     def __init__(self, layer_sizes, activation_func="relu"):
         self.layer_sizes = layer_sizes
         self.activation_func = activation_func
-        self.learning_rate = 0.1
+        self.learning_rate = 0.01
         self.weights = []
         self.biases = []
         for i in range(len(self.layer_sizes)):
@@ -18,8 +18,9 @@ class Network:
        # print("\nBiases per layer:\n")
        # for b in self.biases:
        #     print(b, "\n")
-
-        inputs = np.array(inputs).reshape((self.layer_sizes[0],1))
+        
+        if isinstance(inputs, np.ndarray) == False:
+            inputs = np.array(inputs).reshape((self.layer_sizes[0],1))
        # print("\nInputs: \n"+ str(inputs))
 
         outputs = []
@@ -35,7 +36,6 @@ class Network:
         return outputs
         
     def calculate_errors(self, outputs, targets):
-        targets = np.array(targets).reshape((self.layer_sizes[-1],1))
         errors = []
         errors.append(targets - outputs[-1])
         
@@ -54,6 +54,12 @@ class Network:
 
 
     def train(self, inputs, targets):
+        # Convert list inputs to numpy arrays (unless already a np array)
+        if isinstance(inputs, np.ndarray) == False:
+            inputs = np.array(inputs).reshape((self.layer_sizes[0],1))
+        if isinstance(targets, np.ndarray) == False:
+            targets = np.array(targets).reshape((self.layer_sizes[-1],1))
+        
         outputs = self.feedforward(inputs)
         errors = self.calculate_errors(outputs, targets)
        
@@ -72,7 +78,7 @@ class Network:
             
             # Transpose input of layer, and mutiply by gradient to get deltas for weights  
             if layer_index == 0:
-                inputs = np.array(inputs).reshape((self.layer_sizes[0],1))
+           #     inputs = np.array(inputs).reshape((self.layer_sizes[0],1))
                 layer_input_T = np.transpose(inputs)
             else:
                 layer_input_T = np.transpose(outputs[layer_index-1])
@@ -92,6 +98,7 @@ class Network:
 
     def activation(self, x, activation_func):
         if activation_func == "sigmoid":
+            x = np.clip(x, -400, 400)
             return 1/(1+np.exp(-x))
         elif activation_func == "relu":
             return np.maximum(x,0)

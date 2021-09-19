@@ -1,6 +1,5 @@
-from nn import * 
+from neuralnetwork import * 
 import random
-import math
 
 def main():
     nn = Network((2,256,16,1))
@@ -11,11 +10,13 @@ def main():
     [[1,1],[0]],
     [[0,0],[0]]
     ]
-    for i in range(5000):
+
+    
+    for i in range(1000):
         a = random.randint(0,3)
         nn.train(training_data[a][0],training_data[a][1])
+    print("Done!")
     
-    print("\n\n\n\n\n\n")
     while True:
         x1 = int(input())
         x2 = int(input())
