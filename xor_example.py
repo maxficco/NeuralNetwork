@@ -3,7 +3,7 @@ import random
 
 def main():
     nn = Network((2,256,16,1))
-    
+    print(nn)    
     training_data = [
     [[1,0],[1]],
     [[0,1],[1]],

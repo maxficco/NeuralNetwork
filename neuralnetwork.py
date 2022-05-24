@@ -4,24 +4,18 @@ class Network:
     def __init__(self, layer_sizes, activation_func="relu"):
         self.layer_sizes = layer_sizes
         self.activation_func = activation_func
-        self.learning_rate = 0.01
+        self.learning_rate = 0.004
         self.weights = []
         self.biases = []
         for i in range(len(self.layer_sizes)):
             if i != 0:
                 self.weights.append(np.random.standard_normal((self.layer_sizes[i], self.layer_sizes[i-1])))
                 self.biases.append(np.zeros((self.layer_sizes[i],1)))
+
     def feedforward(self, inputs):
-       ## print("\nWeights per layer:\n")
-       # for w in self.weights:
-       #     print(w, "\n")
-       # print("\nBiases per layer:\n")
-       # for b in self.biases:
-       #     print(b, "\n")
-        
+        #(just for when testing with non np arrays)
         if isinstance(inputs, np.ndarray) == False:
             inputs = np.array(inputs).reshape((self.layer_sizes[0],1))
-       # print("\nInputs: \n"+ str(inputs))
 
         outputs = []
         for i, (w,b) in enumerate(zip(self.weights,self.biases)):
@@ -32,7 +26,7 @@ class Network:
                 output = self.activation(output, self.activation_func)
             outputs.append(output)
             inputs = output
-        #print("\nOutputs of Neural Network:\n" + str(outputs))
+
         return outputs
         
     def calculate_errors(self, outputs, targets):
@@ -45,9 +39,6 @@ class Network:
  
         for count, wt in enumerate(weights_T):
             errors.append(np.matmul(wt, errors[count]))
-       #     print("\nErrors of Outputs and Hidden Layers:\n")
-       # for err in errors:
-       #     print(err, "\n")
         
         errors.reverse() # Errors now going left->right (helps with train)
         return errors
@@ -63,7 +54,7 @@ class Network:
         outputs = self.feedforward(inputs)
         errors = self.calculate_errors(outputs, targets)
        
-        
+
         # Calculate Gradients and Deltas from left->right through layers
         gradients = []
         deltas = []
@@ -78,7 +69,6 @@ class Network:
             
             # Transpose input of layer, and mutiply by gradient to get deltas for weights  
             if layer_index == 0:
-           #     inputs = np.array(inputs).reshape((self.layer_sizes[0],1))
                 layer_input_T = np.transpose(inputs)
             else:
                 layer_input_T = np.transpose(outputs[layer_index-1])
